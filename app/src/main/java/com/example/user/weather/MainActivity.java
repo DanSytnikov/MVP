@@ -7,8 +7,10 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import java.io.BufferedReader;
@@ -18,6 +20,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -36,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
     public Handler handler;
     public Response<Example> res;
     public Example data;
+    public int errorCode;
+
 
     @SuppressLint("HandlerLeak")
     @Override
@@ -53,24 +59,38 @@ public class MainActivity extends AppCompatActivity {
             @SuppressLint("SetTextI18n")
             @Override
             public void handleMessage(Message msg) {
-                res = (Response<Example>) msg.obj;
-                data = res.body();
-                Log.e("sa", String.valueOf(data.getCoord().getLat()));
-                TextView tv = findViewById(R.id.textView);
+                switch (msg.arg1) {
+                    case 0:
+                        showToast("Please, connect to the Internet.");
+                        break;
+                    case 1:
+                        showToast("Connected.");
+                        res = (Response<Example>) msg.obj;
+                        data = res.body();
+                        Log.e("sa", String.valueOf(data.getCoord().getLat()));
+                        TextView tv = findViewById(R.id.textView);
 
-                tv.setText(
-                        "City: " + data.getName() +
-                                "\nCoordinates: " + data.getCoord().getLon() + "   " + data.getCoord().getLat() +
-                                "\nTemp: " + data.getMain().getTemp() + " Humidity: " + data.getMain().getHumidity() +
-                                "\nVisibility: " + data.getVisibility() +
-                                "\nWind: " + data.getWind().getSpeed() +
-                                "\nClouds: " + data.getWeather().get(0).description);
-
+                        tv.setText(
+                                "City: " + data.getName() +
+                                        "\nCoordinates: " + data.getCoord().getLon() + "   " + data.getCoord().getLat() +
+                                        "\nTemp: " + data.getMain().getTemp() + " Humidity: " + data.getMain().getHumidity() +
+                                        "\nVisibility: " + data.getVisibility() +
+                                        "\nWind: " + data.getWind().getSpeed() +
+                                        "\nClouds: " + data.getWeather().get(0).description);
+                        break;
+                }
             }
         };
-
     }
 
+
+
+
+    public void showToast(String tstmsg) {
+        Toast toast = Toast.makeText(getApplicationContext(), tstmsg, Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+    }
 
     public String tempr;
 
@@ -91,22 +111,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public class GetOpenWeather extends Thread {
+
         @Override
         public void run() {
             try {
                 Log.d("RUN", "Thread started.");
 
-                Call<Example> responseCall = retroInterface.getWeather("Odessa", "a7c76f80c9580699351007ff55f2e86d");
+                Call<Example> responseCall = retroInterface.getWeather("Odessa,ua", "a7c76f80c9580699351007ff55f2e86d");
                 Response<Example> res = responseCall.execute();
+
                 Log.d("RUN", "Response's ready.");
 
                 Message msg = new Message();
                 msg.obj = res;
+                msg.arg1 = 1;
                 handler.sendMessage(msg);
                 Log.d("RUN", "Object sent");
-                Coord coord = res.body().getCoord();
+
 
             } catch (IOException e) {
+                Message msg = new Message();
+                msg.obj = e.getLocalizedMessage();
+                msg.arg1 = 0;
+                handler.sendMessage(msg);
                 e.printStackTrace();
             }
             interrupt();
@@ -121,6 +148,8 @@ public class MainActivity extends AppCompatActivity {
             try {
                 URL url = new URL("http://api.openweathermap.org/data/2.5/weather?q=Odessa&appid=a7c76f80c9580699351007ff55f2e86d");
                 HttpURLConnection huc = (HttpURLConnection) url.openConnection();
+
+
                 BufferedReader br = new BufferedReader(new InputStreamReader(huc.getInputStream()));
                 StringBuilder sb = new StringBuilder();
                 String line;

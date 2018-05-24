@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="@drawable/pexelnexel"
     android:layout_height="match_parent"
     tools:context="com.example.user.weather.MainActivity">
 
@@ -24,8 +25,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="188dp"
+        android:textColor="@color/Black"
         android:gravity="center"
-        android:background="@color/PaleTurquoise"
         app:layout_constraintBottom_toTopOf="@+id/button2"
         tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="0dp" />
