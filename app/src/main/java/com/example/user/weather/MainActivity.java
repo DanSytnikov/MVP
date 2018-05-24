@@ -8,6 +8,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
+
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -21,6 +24,7 @@ import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+
 import static java.net.Proxy.Type.HTTP;
 
 
@@ -30,8 +34,8 @@ public class MainActivity extends AppCompatActivity {
     private static RetroInterface retroInterface;
     private Retrofit retrofit;
     public Handler handler;
-    Response response;
-
+    public Response<Example> res;
+    public Example data;
 
     @SuppressLint("HandlerLeak")
     @Override
@@ -46,15 +50,29 @@ public class MainActivity extends AppCompatActivity {
         retroInterface = retrofit.create(RetroInterface.class); //Создаем объект, при помощи которого будем выполнять запросы
 
         handler = new Handler() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void handleMessage(Message msg) {
-                response = (Response) msg.obj;
+                res = (Response<Example>) msg.obj;
+                data = res.body();
+                Log.e("sa", String.valueOf(data.getCoord().getLat()));
+                TextView tv = findViewById(R.id.textView);
+
+                tv.setText(
+                        "City: " + data.getName() +
+                                "\nCoordinates: " + data.getCoord().getLon() + "   " + data.getCoord().getLat() +
+                                "\nTemp: " + data.getMain().getTemp() + " Humidity: " + data.getMain().getHumidity() +
+                                "\nVisibility: " + data.getVisibility() +
+                                "\nWind: " + data.getWind().getSpeed() +
+                                "\nClouds: " + data.getWeather().get(0).description);
+
             }
         };
+
     }
 
-    public String tempr ;
 
+    public String tempr;
 
 
     public static RetroInterface getApi() {
@@ -62,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //Response response = getApi().getWeather("Odessa", "a7c76f80c9580699351007ff55f2e86d").execute();
+    //http://samples.openweathermap.org/data/2.5/forecast?id=698740&appid=a7c76f80c9580699351007ff55f2e86d
 
 
     public void onClick(View view) {
@@ -77,20 +96,22 @@ public class MainActivity extends AppCompatActivity {
             try {
                 Log.d("RUN", "Thread started.");
 
-                Call<ResponseBody> responseCall = retroInterface.getWeather("Odessa", "a7c76f80c9580699351007ff55f2e86d");
-                Response<ResponseBody> res = responseCall.execute();
-                ResponseBody weatherResponse = res.body();
+                Call<Example> responseCall = retroInterface.getWeather("Odessa", "a7c76f80c9580699351007ff55f2e86d");
+                Response<Example> res = responseCall.execute();
                 Log.d("RUN", "Response's ready.");
 
                 Message msg = new Message();
-                msg.obj = weatherResponse;
+                msg.obj = res;
+                handler.sendMessage(msg);
                 Log.d("RUN", "Object sent");
+                Coord coord = res.body().getCoord();
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
+            interrupt();
         }
+
     }
 
     public class ThreadWeather extends Thread {

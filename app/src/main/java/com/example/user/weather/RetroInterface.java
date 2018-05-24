@@ -1,5 +1,7 @@
 package com.example.user.weather;
 
+
+
 import java.util.List;
 
 import okhttp3.ResponseBody;
@@ -11,5 +13,5 @@ import retrofit2.http.Query;
 
 public interface RetroInterface {
         @GET("/data/2.5/weather")
-        Call<ResponseBody> getWeather(@Query("q") String cityName, @Query("appid") String appId);
+        Call<Example> getWeather(@Query("q") String cityName, @Query("appid") String appId);
 }
