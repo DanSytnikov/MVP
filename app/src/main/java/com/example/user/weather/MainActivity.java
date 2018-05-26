@@ -2,6 +2,7 @@ package com.example.user.weather;
 
 import android.annotation.SuppressLint;
 import android.nfc.Tag;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +22,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -43,11 +46,12 @@ public class MainActivity extends AppCompatActivity {
     public int errorCode;
 
 
-    @SuppressLint("HandlerLeak")
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         retrofit = new Retrofit.Builder()
                 .baseUrl("http://api.openweathermap.org") //Базовая часть адреса
@@ -55,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         retroInterface = retrofit.create(RetroInterface.class); //Создаем объект, при помощи которого будем выполнять запросы
 
-        handler = new Handler() {
+       /* handler = new Handler() {
             @SuppressLint("SetTextI18n")
             @Override
             public void handleMessage(Message msg) {
@@ -81,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
+        */
     }
 
 
@@ -104,16 +109,24 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void onClick(View view) {
-        GetOpenWeather threadWeather = new GetOpenWeather();
-        threadWeather.start();
+        GetOpenWeather gow = new GetOpenWeather();
+        gow.execute();
         Log.e("RESPONSE", "");
 
     }
 
-    public class GetOpenWeather extends Thread {
+    class GetOpenWeather extends AsyncTask<Void, Void, Response<Example>> {
 
         @Override
-        public void run() {
+        protected void onPreExecute() {
+            super.onPreExecute();
+            ProgressBar pg = findViewById(R.id.pb);
+            pg.setVisibility(View.VISIBLE);
+
+        }
+
+      /*  @Override
+        public void doInBackground() {
             try {
                 Log.d("RUN", "Thread started.");
 
@@ -137,8 +150,46 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
             interrupt();
+        }*/
+
+        @Override
+        protected Response<Example> doInBackground(Void... voids) {
+            try {
+                Log.d("RUN", "Thread started.");
+
+                Call<Example> responseCall = retroInterface.getWeather("Odessa,ua", "a7c76f80c9580699351007ff55f2e86d");
+                Response<Example> res = responseCall.execute();
+
+                Log.d("RUN", "Response's ready.");
+
+
+                Log.d("RUN", "Object sent");
+                return res;
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return res;
         }
 
+        @Override
+        protected void onPostExecute(Response<Example> resp) {
+            super.onPostExecute(resp);
+            ProgressBar pg = findViewById(R.id.pb);
+            pg.setVisibility(View.INVISIBLE);
+            showToast("Connected.");
+            data = resp.body();
+            Log.e("sa", String.valueOf(data.getCoord().getLat()));
+            TextView tv = findViewById(R.id.textView);
+
+            tv.setText(
+                    "City: " + data.getName() +
+                            "\nCoordinates: " + data.getCoord().getLon() + "   " + data.getCoord().getLat() +
+                            "\nTemp: " + data.getMain().getTemp() + " Humidity: " + data.getMain().getHumidity() +
+                            "\nVisibility: " + data.getVisibility() +
+                            "\nWind: " + data.getWind().getSpeed() +
+                            "\nClouds: " + data.getWeather().get(0).description);
+        }
     }
 
     public class ThreadWeather extends Thread {
