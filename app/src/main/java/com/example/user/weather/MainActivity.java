@@ -46,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
     public int errorCode;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,36 +58,8 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         retroInterface = retrofit.create(RetroInterface.class); //Создаем объект, при помощи которого будем выполнять запросы
 
-       /* handler = new Handler() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void handleMessage(Message msg) {
-                switch (msg.arg1) {
-                    case 0:
-                        showToast("Please, connect to the Internet.");
-                        break;
-                    case 1:
-                        showToast("Connected.");
-                        res = (Response<Example>) msg.obj;
-                        data = res.body();
-                        Log.e("sa", String.valueOf(data.getCoord().getLat()));
-                        TextView tv = findViewById(R.id.textView);
 
-                        tv.setText(
-                                "City: " + data.getName() +
-                                        "\nCoordinates: " + data.getCoord().getLon() + "   " + data.getCoord().getLat() +
-                                        "\nTemp: " + data.getMain().getTemp() + " Humidity: " + data.getMain().getHumidity() +
-                                        "\nVisibility: " + data.getVisibility() +
-                                        "\nWind: " + data.getWind().getSpeed() +
-                                        "\nClouds: " + data.getWeather().get(0).description);
-                        break;
-                }
-            }
-        };
-        */
     }
-
-
 
 
     public void showToast(String tstmsg) {
@@ -168,8 +139,8 @@ public class MainActivity extends AppCompatActivity {
 
             } catch (IOException e) {
                 e.printStackTrace();
+                return null;
             }
-            return res;
         }
 
         @Override
@@ -177,18 +148,23 @@ public class MainActivity extends AppCompatActivity {
             super.onPostExecute(resp);
             ProgressBar pg = findViewById(R.id.pb);
             pg.setVisibility(View.INVISIBLE);
-            showToast("Connected.");
-            data = resp.body();
-            Log.e("sa", String.valueOf(data.getCoord().getLat()));
-            TextView tv = findViewById(R.id.textView);
+            if (resp != null) {
+                showToast("Connected");
+                data = resp.body();
+                Log.e("sa", String.valueOf(data.getCoord().getLat()));
+                TextView tv = findViewById(R.id.textView);
 
-            tv.setText(
-                    "City: " + data.getName() +
-                            "\nCoordinates: " + data.getCoord().getLon() + "   " + data.getCoord().getLat() +
-                            "\nTemp: " + data.getMain().getTemp() + " Humidity: " + data.getMain().getHumidity() +
-                            "\nVisibility: " + data.getVisibility() +
-                            "\nWind: " + data.getWind().getSpeed() +
-                            "\nClouds: " + data.getWeather().get(0).description);
+                tv.setText(
+                        "City: " + data.getName() +
+                                "\nCoordinates: " + data.getCoord().getLon() + "   " + data.getCoord().getLat() +
+                                "\nTemp: " + data.getMain().getTemp() + " Humidity: " + data.getMain().getHumidity() +
+                                "\nVisibility: " + data.getVisibility() +
+                                "\nWind: " + data.getWind().getSpeed() +
+                                "\nClouds: " + data.getWeather().get(0).description);
+            }
+            else{
+                showToast("Lost Connection...");
+            }
         }
     }
 
