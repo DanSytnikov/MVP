@@ -7,6 +7,14 @@
     android:layout_height="match_parent"
     tools:context="com.example.user.weather.MainActivity">
 
+    <view class="android.support.v7.app.AlertController$RecycleListView"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:id="@+id/recView"
+        app:layoutManager = "android.support.v7.widget.LinearLayoutManager"
+        />
+
+
     <Button
         android:id="@+id/button2"
         android:layout_width="158dp"

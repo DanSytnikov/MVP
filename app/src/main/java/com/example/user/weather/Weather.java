@@ -8,16 +8,16 @@ public class Weather {
 
     @SerializedName("id")
     @Expose
-    public Integer id;
+    private Integer id;
     @SerializedName("main")
     @Expose
-    public String main;
+    private String main;
     @SerializedName("description")
     @Expose
-    public String description;
+    private String description;
     @SerializedName("icon")
     @Expose
-    public String icon;
+    private String icon;
 
     public Integer getId() {
         return id;
