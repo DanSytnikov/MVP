@@ -2,17 +2,18 @@ package com.example.user.weather;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -34,12 +35,31 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity {
 
     private static RetroInterface retroInterface;
+    public static WeakReference<MainActivity> activity;
     private Retrofit retrofit;
     public Example data;
     public java.util.List<List> dataList;
     public double aLat;
     public double aLon;
     private LocationManager locationManager;
+
+
+    MyBroadcastReceiver receiver;
+
+    public boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        return cm.getActiveNetworkInfo() != null;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        IntentFilter filter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
+        registerReceiver(receiver, filter);
+
+    }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -58,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        receiver = new MyBroadcastReceiver();
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         int permissionStatus = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
@@ -80,21 +101,21 @@ public class MainActivity extends AppCompatActivity {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        locationManager.requestLocationUpdates(
+        /*locationManager.requestLocationUpdates(
                 LocationManager.NETWORK_PROVIDER, 1000, 10,
                 locationListener);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                 1000, 10, locationListener);
-        checkEnabled();
+        checkEnabled();*/
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        locationManager.removeUpdates(locationListener);
+//        locationManager.removeUpdates(locationListener);
     }
 
-    private LocationListener locationListener = new LocationListener() {
+    /*private LocationListener locationListener = new LocationListener() {
 
         @Override
         public void onLocationChanged(Location location) {
@@ -109,9 +130,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onProviderEnabled(String provider) {
             checkEnabled();
-            /*if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            *//*if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             }
-            showLocation(locationManager.getLastKnownLocation(provider));*/
+            showLocation(locationManager.getLastKnownLocation(provider));*//*
         }
 
         @Override
@@ -126,9 +147,9 @@ public class MainActivity extends AppCompatActivity {
                 showLocation(locationManager.getLastKnownLocation(provider));
             }
         }
-    };
+    };*/
 
-    private void showLocation(Location location) {
+   /* private void showLocation(Location location) {
         if (location == null)
             return;
         if (location.getProvider().equals(LocationManager.NETWORK_PROVIDER)) {
@@ -137,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
             aLat = location.getLatitude();
             aLon = location.getLongitude();
         }
-    }
+    }*/
 
     @SuppressLint("DefaultLocale")
     private String formatLocation(Location location) {
@@ -149,14 +170,14 @@ public class MainActivity extends AppCompatActivity {
                         location.getTime()));
     }
 
-    private void checkEnabled() {
+    /*private void checkEnabled() {
         Log.e("GPS", "Enabled: "
                 + locationManager
                 .isProviderEnabled(LocationManager.GPS_PROVIDER));
         Log.e("NETWORK", "Enabled: "
                 + locationManager
                 .isProviderEnabled(LocationManager.NETWORK_PROVIDER));
-    }
+    }*/
 
 
     public void showToast(String tstmsg) {
@@ -200,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
         protected Response<Example> doInBackground(Void... voids) {
             try {
                 Log.d("RUN", "Thread started.");
-                Call<Example> responseCall = retroInterface.getWeather(String.valueOf(aLat), String.valueOf(aLon), "a7c76f80c9580699351007ff55f2e86d");
+                Call<Example> responseCall = retroInterface.getWeather(String.valueOf(46.469391), String.valueOf(30.740883), "a7c76f80c9580699351007ff55f2e86d");
                 Response<Example> res = responseCall.execute();
                 Log.d("RUN", "Resp result: " + res.code());
                 return res;
@@ -221,7 +242,7 @@ public class MainActivity extends AppCompatActivity {
 //            RecyclerView list = activity.get().findViewById(R.id.list);
 //            list.setAdapter(new WeatherAdapter(v.getList()));
             if (data.getCod().equals("200")) {
-                showToast(data.getCity().getName());
+//                showToast(data.getCity().getName());
                 TextView tv = findViewById(R.id.textView);
                 tv.setText("" + data.getCity().getName() + "Temp: " + data.getList().get(0).getMain().getTemp());
 
@@ -237,4 +258,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(receiver);
+    }
 }
