@@ -4,7 +4,9 @@ package com.example.user.weather.respModel;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Rain {
+import io.realm.RealmObject;
+
+public class Rain extends RealmObject {
 
     @SerializedName("3h")
     @Expose

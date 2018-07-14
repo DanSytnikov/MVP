@@ -2,14 +2,11 @@ package com.example.user.weather;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.ConnectivityManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -18,26 +15,22 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import io.realm.gradle.RealmPluginExtension;
-import io.realm.gradle.Version;
 
 
-import com.example.user.weather.respModel.List;
+import com.example.user.weather.respModel.Data;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.Date;
 
-import io.realm.gradle.Realm;
-import retrofit2.Call;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
-import static java.security.AccessController.getContext;
+import io.realm.OrderedCollectionChangeSet;
+import io.realm.OrderedRealmCollectionChangeListener;
+import io.realm.Realm;
+import io.realm.RealmCollection;
+import io.realm.RealmResults;
+import retrofit2.Retrofit;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -46,12 +39,12 @@ public class MainActivity extends AppCompatActivity {
     public static WeakReference<MainActivity> activity;
     private Retrofit retrofit;
     public Example data;
-    public java.util.List<List> dataList;
+    public java.util.List<Data> dataData;
     public double aLat;
     public double aLon;
     private LocationManager locationManager;
     private Realm realm;
-
+    TextView tv;
 
 
     MyBroadcastReceiver receiver;
@@ -97,7 +90,8 @@ public class MainActivity extends AppCompatActivity {
 //                .addConverterFactory(GsonConverterFactory.create()) //Конвертер, необходимый для преобразования JSON'а в объекты
 //                .build();
 //        retroInterface = retrofit.create(RetroInterface.class); //Создаем объект, при помощи которого будем выполнять запросы
-//        Realm realm = Realm.getInstance(this.getContext()); // Not entirely correct as getContext isn't available everywhere.
+
+        realm = Realm.getDefaultInstance();
     }
 
     @Override
@@ -112,6 +106,15 @@ public class MainActivity extends AppCompatActivity {
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                 1000, 10, locationListener);
         checkEnabled();*/
+        tv  = findViewById(R.id.textView);
+        final RealmResults<Example> realmResult = realm.where(Example.class).findAll();
+        realmResult.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Example>>(){
+
+            @Override
+            public void onChange(RealmResults<Example> examples, OrderedCollectionChangeSet changeSet) {
+                tv.setText(realmResult.);
+            }
+        });
     }
 
     @Override
@@ -194,7 +197,15 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClick(View view) {
         startService(new Intent(this, MyIntentService.class));
-        Log.e("AAAAAAAAAAAAAAAAAAAA","CTIVITY STARTED");
+        tv = findViewById(R.id.textView);
+        Example realmResults = realm.where(Example.class).findFirst();
+        if(realmResults != null) {
+            String cityname = realmResults.getCity().getName();
+            if (cityname != null) {
+                tv.setText(cityname);
+            }
+        }
+        Log.e("AAAAAAAAAAAAAAAAAAAA", "CTIVITY STARTED");
 //        GetOpenWeather gow = new GetOpenWeather(this);
 //        gow.execute();
         Log.e("RESPONSE", "");
@@ -244,17 +255,17 @@ public class MainActivity extends AppCompatActivity {
 //            ProgressBar pg = findViewById(R.id.pb);
 //            pg.setVisibility(View.INVISIBLE);
 //            data = resp.body();
-//            dataList = data.getList();
+//            dataData = data.getData();
 ////            RecyclerView list = activity.get().findViewById(R.id.list);
-////            list.setAdapter(new WeatherAdapter(v.getList()));
+////            list.setAdapter(new WeatherAdapter(v.getData()));
 //            if (data.getCod().equals("200")) {
 ////                showToast(data.getCity().getName());
 //                TextView tv = findViewById(R.id.textView);
-//                tv.setText("" + data.getCity().getName() + "Temp: " + data.getList().get(0).getMain().getTemp());
+//                tv.setText("" + data.getCity().getName() + "Temp: " + data.getData().get(0).getMain().getTemp());
 //
 //                {
 //                    System.out.println(
-//                            data.getCity().getName() + " " + dataList.get(0).getDtTxt()+""
+//                            data.getCity().getName() + " " + dataData.get(0).getDtTxt()+""
 //                    );
 //                }
 //

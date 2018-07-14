@@ -4,7 +4,11 @@ package com.example.user.weather.respModel;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class List {
+import io.realm.RealmList;
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+
+public class Data extends RealmObject{
 
     @SerializedName("dt")
     @Expose
@@ -14,7 +18,7 @@ public class List {
     private Main main;
     @SerializedName("weather")
     @Expose
-    private java.util.List<Weather> weather = null;
+    private RealmList<Weather> weather = null;
     @SerializedName("clouds")
     @Expose
     private Clouds clouds;
@@ -50,11 +54,11 @@ public class List {
         this.main = main;
     }
 
-    public java.util.List<Weather> getWeather() {
+    public RealmList<Weather> getWeather() {
         return weather;
     }
 
-    public void setWeather(java.util.List<Weather> weather) {
+    public void setWeather(RealmList<Weather> weather) {
         this.weather = weather;
     }
 

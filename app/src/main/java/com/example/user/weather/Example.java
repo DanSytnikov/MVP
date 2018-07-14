@@ -2,14 +2,18 @@
 package com.example.user.weather;
 
 import com.example.user.weather.respModel.City;
-import com.example.user.weather.respModel.List;
+import com.example.user.weather.respModel.Data;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import io.realm.gradle.Realm;
+import java.util.List;
 
-public class Example{
+import io.realm.RealmList;
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
+
+public class Example extends RealmObject {
     @SerializedName("cod")
     @Expose
     private String cod;
@@ -19,9 +23,9 @@ public class Example{
     @SerializedName("cnt")
     @Expose
     private Integer cnt;
+
     @SerializedName("list")
-    @Expose
-    private java.util.List<List> list = null;
+    private RealmList<Data> list;
     @SerializedName("city")
     @Expose
     private City city;
@@ -50,12 +54,12 @@ public class Example{
         this.cnt = cnt;
     }
 
-    public java.util.List<List> getList() {
+    public RealmList<Data> getData() {
         return list;
     }
 
-    public void setList(java.util.List<List> list) {
-        this.list = list;
+    public void setData(RealmList<Data> data) {
+        this.list = data;
     }
 
     public City getCity() {
