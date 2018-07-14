@@ -6,7 +6,9 @@ import com.example.user.weather.respModel.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Example {
+import io.realm.gradle.Realm;
+
+public class Example{
 
     @SerializedName("cod")
     @Expose

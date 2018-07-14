@@ -3,6 +3,7 @@ package com.example.user.weather;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -20,21 +21,28 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import io.realm.gradle.RealmPluginExtension;
+import io.realm.gradle.Version;
+
 
 import com.example.user.weather.respModel.List;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.Date;
+
+import io.realm.gradle.Realm;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static java.security.AccessController.getContext;
+
 
 public class MainActivity extends AppCompatActivity {
 
-    private static RetroInterface retroInterface;
+    public RetroInterface retroInterface;
     public static WeakReference<MainActivity> activity;
     private Retrofit retrofit;
     public Example data;
@@ -42,15 +50,12 @@ public class MainActivity extends AppCompatActivity {
     public double aLat;
     public double aLon;
     private LocationManager locationManager;
+    private Realm realm;
+
 
 
     MyBroadcastReceiver receiver;
 
-    public boolean isNetworkConnected() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        return cm.getActiveNetworkInfo() != null;
-    }
 
     @Override
     protected void onStart() {
@@ -77,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         receiver = new MyBroadcastReceiver();
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -86,13 +92,12 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
 
-        retrofit = new Retrofit.Builder()
-                .baseUrl("http://api.openweathermap.org") //Базовая часть адреса
-                .addConverterFactory(GsonConverterFactory.create()) //Конвертер, необходимый для преобразования JSON'а в объекты
-                .build();
-        retroInterface = retrofit.create(RetroInterface.class); //Создаем объект, при помощи которого будем выполнять запросы
-
-
+//        retrofit = new Retrofit.Builder()
+//                .baseUrl("http://api.openweathermap.org") //Базовая часть адреса
+//                .addConverterFactory(GsonConverterFactory.create()) //Конвертер, необходимый для преобразования JSON'а в объекты
+//                .build();
+//        retroInterface = retrofit.create(RetroInterface.class); //Создаем объект, при помощи которого будем выполнять запросы
+//        Realm realm = Realm.getInstance(this.getContext()); // Not entirely correct as getContext isn't available everywhere.
     }
 
     @Override
@@ -188,75 +193,76 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void onClick(View view) {
-
-        GetOpenWeather gow = new GetOpenWeather(this);
-        gow.execute();
+        startService(new Intent(this, MyIntentService.class));
+        Log.e("AAAAAAAAAAAAAAAAAAAA","CTIVITY STARTED");
+//        GetOpenWeather gow = new GetOpenWeather(this);
+//        gow.execute();
         Log.e("RESPONSE", "");
 
     }
 
-    @SuppressLint("StaticFieldLeak")
-    class GetOpenWeather extends AsyncTask<Void, Void, Response<Example>> {
-        private WeakReference<MainActivity> activity;
-
-
-        public GetOpenWeather(MainActivity activity) {
-            this.activity = new WeakReference<>(activity);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            MainActivity main = activity.get();
-            if (main != null) {
-
-            }
-            ProgressBar pg = findViewById(R.id.pb);
-            pg.setVisibility(View.VISIBLE);
-
-        }
-
-
-        @Override
-        protected Response<Example> doInBackground(Void... voids) {
-            try {
-                Log.d("RUN", "Thread started.");
-                Call<Example> responseCall = retroInterface.getWeather(String.valueOf(46.469391), String.valueOf(30.740883), "a7c76f80c9580699351007ff55f2e86d");
-                Response<Example> res = responseCall.execute();
-                Log.d("RUN", "Resp result: " + res.code());
-                return res;
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Response<Example> resp) {
-            super.onPostExecute(resp);
-            ProgressBar pg = findViewById(R.id.pb);
-            pg.setVisibility(View.INVISIBLE);
-            data = resp.body();
-            dataList = data.getList();
-//            RecyclerView list = activity.get().findViewById(R.id.list);
-//            list.setAdapter(new WeatherAdapter(v.getList()));
-            if (data.getCod().equals("200")) {
-//                showToast(data.getCity().getName());
-                TextView tv = findViewById(R.id.textView);
-                tv.setText("" + data.getCity().getName() + "Temp: " + data.getList().get(0).getMain().getTemp());
-
-                {
-                    System.out.println(
-                            data.getCity().getName() + " " + dataList.get(0).getDtTxt()+""
-                    );
-                }
-
-            } else {
-                showToast("Lost Connection...");
-            }
-        }
-    }
+//    @SuppressLint("StaticFieldLeak")
+//    class GetOpenWeather extends Realm {
+//        private WeakReference<MainActivity> activity;
+//
+//
+//        public GetOpenWeather(MainActivity activity) {
+//            this.activity = new WeakReference<>(activity);
+//        }
+//
+//        @Override
+//        protected void onPreExecute() {
+//            super.onPreExecute();
+//            MainActivity main = activity.get();
+//            if (main != null) {
+//
+//            }
+//            ProgressBar pg = findViewById(R.id.pb);
+//            pg.setVisibility(View.VISIBLE);
+//
+//        }
+//
+//
+//        @Override
+//        protected Response<Example> doInBackground(Void... voids) {
+//            try {
+//                Log.d("RUN", "Thread started.");
+//                Call<Example> responseCall = retroInterface.getWeather(String.valueOf(46.469391), String.valueOf(30.740883), "a7c76f80c9580699351007ff55f2e86d");
+//                Response<Example> res = responseCall.execute();
+//                Log.d("RUN", "Resp result: " + res.code());
+//                return res;
+//
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//                return null;
+//            }
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Response<Example> resp) {
+//            super.onPostExecute(resp);
+//            ProgressBar pg = findViewById(R.id.pb);
+//            pg.setVisibility(View.INVISIBLE);
+//            data = resp.body();
+//            dataList = data.getList();
+////            RecyclerView list = activity.get().findViewById(R.id.list);
+////            list.setAdapter(new WeatherAdapter(v.getList()));
+//            if (data.getCod().equals("200")) {
+////                showToast(data.getCity().getName());
+//                TextView tv = findViewById(R.id.textView);
+//                tv.setText("" + data.getCity().getName() + "Temp: " + data.getList().get(0).getMain().getTemp());
+//
+//                {
+//                    System.out.println(
+//                            data.getCity().getName() + " " + dataList.get(0).getDtTxt()+""
+//                    );
+//                }
+//
+//            } else {
+//                showToast("Lost Connection...");
+//            }
+//        }
+//    }
 
     @Override
     protected void onStop() {
