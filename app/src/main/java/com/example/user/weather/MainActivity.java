@@ -22,13 +22,17 @@ import android.widget.Toast;
 import com.example.user.weather.respModel.Data;
 
 import java.lang.ref.WeakReference;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
 import io.realm.OrderedCollectionChangeSet;
 import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.Realm;
 import io.realm.RealmCollection;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 import retrofit2.Retrofit;
 
@@ -106,13 +110,27 @@ public class MainActivity extends AppCompatActivity {
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                 1000, 10, locationListener);
         checkEnabled();*/
-        tv  = findViewById(R.id.textView);
+        tv = findViewById(R.id.textView);
         final RealmResults<Example> realmResult = realm.where(Example.class).findAll();
-        realmResult.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Example>>(){
+        realmResult.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Example>>() {
 
             @Override
             public void onChange(RealmResults<Example> examples, OrderedCollectionChangeSet changeSet) {
-                tv.setText(realmResult.);
+                RealmList<Data> dataList = realmResult.last().getData();
+                for (int i = 0; i < realmResult.last().getCnt() - 1; i++) {
+                    ArrayList<Ticket> tickets = new ArrayList<>();
+                    tickets.add(new Ticket(dateFormatter(new java.util.Date((long) dataList.get(i).getDt() * 1000L)),
+                            dataList.get(i).getMain().getTemp(),
+                            dataList.get(i).getMain().getPressure(),
+                            dataList.get(i).getMain().getHumidity(),
+                            dataList.get(i).getWeather().get(0).getDescription(),
+                            dataList.get(i).getWind().getSpeed(),
+                            dataList.get(i).getWeather().get(0).getIcon()));
+                    Log.e("DATE", dateFormatter(new java.util.Date((long) dataList.get(i).getDt() * 1000L)));
+
+                }
+
+
             }
         });
     }
@@ -197,21 +215,15 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClick(View view) {
         startService(new Intent(this, MyIntentService.class));
-        tv = findViewById(R.id.textView);
-        Example realmResults = realm.where(Example.class).findFirst();
-        if(realmResults != null) {
-            String cityname = realmResults.getCity().getName();
-            if (cityname != null) {
-                tv.setText(cityname);
-            }
-        }
-        Log.e("AAAAAAAAAAAAAAAAAAAA", "CTIVITY STARTED");
-//        GetOpenWeather gow = new GetOpenWeather(this);
-//        gow.execute();
-        Log.e("RESPONSE", "");
-
     }
 
+    public String dateFormatter(Date date) {
+        SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+        sdf.setTimeZone(java.util.TimeZone.getTimeZone("GMT+2"));
+        String formattedDate = sdf.format(date);
+        formattedDate = formattedDate.substring(0, formattedDate.length() - 9);
+        return formattedDate;
+    }
 //    @SuppressLint("StaticFieldLeak")
 //    class GetOpenWeather extends Realm {
 //        private WeakReference<MainActivity> activity;
