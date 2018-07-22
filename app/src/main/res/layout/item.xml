@@ -19,6 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
+            android:textColor="@color/Black"
             android:text=""
             android:textSize="20sp">
         </TextView>
@@ -27,10 +28,18 @@
             android:layout_width="match_parent"
             android:layout_height="25dp"
             android:layout_marginTop="5dp"
+            android:textColor="@color/Black"
             android:text=""
             android:textSize="15sp">
         </TextView>
+        <View
+            android:id="@+id/separator"
+            android:layout_height="0.5dp"
+            android:layout_width="match_parent"
+            android:background="@color/Black"/>
+
     </LinearLayout>
+
     <TextView
         android:id="@+id/wDate"
         android:layout_width="wrap_content"
@@ -47,4 +56,5 @@
         android:layout_height="wrap_content"
         android:src="@drawable/common_google_signin_btn_icon_dark_normal">
     </ImageView>
+
 </LinearLayout>

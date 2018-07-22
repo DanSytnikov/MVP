@@ -51,11 +51,23 @@ public class MainActivity extends AppCompatActivity {
     public double aLon;
     private LocationManager locationManager;
     private Realm realm;
+    private WeatherAdapter adapter;
     TextView tv;
-    ArrayList<Ticket> tickets;
+
     RecyclerView rv;
     MyBroadcastReceiver receiver;
     private static MainActivity mApp = null;
+    public OrderedRealmCollectionChangeListener<RealmResults<Example>> ordRealmColl = new OrderedRealmCollectionChangeListener<RealmResults<Example>>() {
+
+        @Override
+        public void onChange(RealmResults<Example> examples, OrderedCollectionChangeSet changeSet) {
+
+
+            adapter.swapItems(mapData(examples));
+
+        }
+    };
+
 
     @Override
     protected void onStart() {
@@ -82,12 +94,23 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        rv = findViewById(R.id.recView);
+
         mApp = this;
         setContentView(R.layout.activity_main);
+        rv = findViewById(R.id.recView);
+        realm = Realm.getDefaultInstance();
         receiver = new MyBroadcastReceiver();
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-
+        final RealmResults<Example> realmResult = realm.where(Example.class).findAll();
+        ArrayList<Ticket> arrTickets;
+        if (realmResult.isEmpty()){
+            arrTickets = new ArrayList<>();
+        } else{
+            arrTickets = mapData(realmResult);
+        }
+        realmResult.addChangeListener(ordRealmColl);
+        adapter = new WeatherAdapter(arrTickets);
+        rv.setAdapter(adapter);
         int permissionStatus = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
         if (permissionStatus != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
@@ -99,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
 //                .build();
 //        retroInterface = retrofit.create(RetroInterface.class); //Создаем объект, при помощи которого будем выполнять запросы
 
-        realm = Realm.getDefaultInstance();
+
     }
 
     public static Context context()
@@ -125,27 +148,25 @@ public class MainActivity extends AppCompatActivity {
                 1000, 10, locationListener);
         checkEnabled();*/
         tv = findViewById(R.id.textView);
-        final RealmResults<Example> realmResult = realm.where(Example.class).findAll();
-        realmResult.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Example>>() {
 
-            @Override
-            public void onChange(RealmResults<Example> examples, OrderedCollectionChangeSet changeSet) {
-                RealmList<Data> dataList = realmResult.last().getData();
-                tickets = new ArrayList<>();
-                for (int i = 0; i < realmResult.last().getCnt() - 1; i++) {
-                    tickets.add(new Ticket(dateFormatter(new java.util.Date((long) dataList.get(i).getDt() * 1000L)),
-                            (int)Math.round(dataList.get(i).getMain().getTemp() - 273.15),
-                            dataList.get(i).getMain().getPressure(),
-                            dataList.get(i).getMain().getHumidity(),
-                            dataList.get(i).getWeather().get(0).getDescription(),
-                            dataList.get(i).getWind().getSpeed(),
-                            dataList.get(i).getWeather().get(0).getIcon()));
-                    Log.e("DATE", dateFormatter(new java.util.Date((long) dataList.get(i).getDt() * 1000L)));
-                }
-                WeatherAdapter adapter = new WeatherAdapter(tickets);
-                rv.setAdapter(adapter);
-            }
-        });
+
+
+    }
+
+    public ArrayList<Ticket> mapData(RealmResults<Example> examples){
+        RealmList<Data> dataList = examples.last().getData();
+        ArrayList<Ticket> tickets = new ArrayList<>();
+        for (int i = 0; i < examples.last().getCnt() - 1; i++) {
+            tickets.add(new Ticket(dateFormatter(new java.util.Date((long) dataList.get(i).getDt() * 1000L)),
+                    (int)Math.round(dataList.get(i).getMain().getTemp() - 273.15),
+                    dataList.get(i).getMain().getPressure(),
+                    dataList.get(i).getMain().getHumidity(),
+                    dataList.get(i).getWeather().get(0).getDescription(),
+                    dataList.get(i).getWind().getSpeed(),
+                    dataList.get(i).getWeather().get(0).getIcon()));
+            Log.e("DATE", dateFormatter(new java.util.Date((long) dataList.get(i).getDt() * 1000L)));
+        }
+        return tickets;
     }
 
     @Override
@@ -230,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
         startService(new Intent(this, MyIntentService.class));
     }
 
-    public String dateFormatter(Date date) {
+    public static String dateFormatter(Date date) {
         SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
         sdf.setTimeZone(java.util.TimeZone.getTimeZone("GMT+2"));
         String formattedDate = sdf.format(date);

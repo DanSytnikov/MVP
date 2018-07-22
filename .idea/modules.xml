@@ -5,8 +5,10 @@
       <module fileurl="file://$PROJECT_DIR$/Weather_review.iml" filepath="$PROJECT_DIR$/Weather_review.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/Weather_ser.iml" filepath="$PROJECT_DIR$/.idea/Weather_ser.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/Weather_service.iml" filepath="$PROJECT_DIR$/.idea/Weather_service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Weather_v1.2.iml" filepath="$PROJECT_DIR$/Weather_v1.2.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/Weather_v1.2.iml" filepath="$PROJECT_DIR$/.idea/Weather_v1.2.iml" />
       <module fileurl="file://$PROJECT_DIR$/Weather_v1.2.2.iml" filepath="$PROJECT_DIR$/Weather_v1.2.2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

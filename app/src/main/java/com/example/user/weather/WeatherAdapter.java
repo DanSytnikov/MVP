@@ -18,10 +18,10 @@ import org.w3c.dom.Text;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.RealmResults;
+
 public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.TicketViewHolder> {
 
-    public Context context;
-    public Drawable myDrawable;
     ArrayList<String> ImgUrl = new ArrayList<>();
 
 
@@ -29,7 +29,6 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.TicketVi
     public TicketViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item, parent, false);
         TicketViewHolder tvh = new TicketViewHolder(v);
-        context = MainActivity.context();
 
         ImgUrl.add("http://openweathermap.org/img/w/01d.png");
         ImgUrl.add("http://openweathermap.org/img/w/01n.png");
@@ -60,79 +59,61 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.TicketVi
         holder.Dscr.setText(" Wind: " + tickets.get(position).wWind + "m/s");
         switch (tickets.get(position).wIcon) {
             case "01d":
-                myDrawable = context.getResources().getDrawable(R.drawable.w01d);
-                holder.iconView.setImageDrawable(myDrawable);
+                holder.iconView.setImageResource(R.drawable.w01d);
                 break;
             case "01n":
-                myDrawable = context.getResources().getDrawable(R.drawable.w01n);
-                holder.iconView.setImageDrawable(myDrawable);
+                holder.iconView.setImageResource(R.drawable.w01n);
                 break;
             case "02d":
-                myDrawable = context.getResources().getDrawable(R.drawable.w02d);
-                holder.iconView.setImageDrawable(myDrawable);
+                holder.iconView.setImageResource(R.drawable.w02d);
                 break;
             case "02n":
-                myDrawable = context.getResources().getDrawable(R.drawable.w02n);
-                holder.iconView.setImageDrawable(myDrawable);
+                holder.iconView.setImageResource(R.drawable.w02n);
                 break;
             case "03d":
-                myDrawable = context.getResources().getDrawable(R.drawable.w03d);
-                holder.iconView.setImageDrawable(myDrawable);
+                holder.iconView.setImageResource(R.drawable.w03d);
                 break;
             case "03n":
-                myDrawable = context.getResources().getDrawable(R.drawable.w03d);
-                holder.iconView.setImageDrawable(myDrawable);
+                holder.iconView.setImageResource(R.drawable.w03d);
                 break;
             case "04d":
-                myDrawable = context.getResources().getDrawable(R.drawable.w04d);
-                holder.iconView.setImageDrawable(myDrawable);
+                holder.iconView.setImageResource(R.drawable.w04d);
                 break;
             case "04n":
-                myDrawable = context.getResources().getDrawable(R.drawable.w04d);
-                holder.iconView.setImageDrawable(myDrawable);
+                holder.iconView.setImageResource(R.drawable.w04d);
                 break;
             case "09d":
-                myDrawable = context.getResources().getDrawable(R.drawable.w09d);
-                holder.iconView.setImageDrawable(myDrawable);
+                holder.iconView.setImageResource(R.drawable.w09d);
                 break;
             case "09n":
-                myDrawable = context.getResources().getDrawable(R.drawable.w09d);
-                holder.iconView.setImageDrawable(myDrawable);
+                holder.iconView.setImageResource(R.drawable.w09d);
                 break;
             case "10d":
-                myDrawable = context.getResources().getDrawable(R.drawable.w10d);
-                holder.iconView.setImageDrawable(myDrawable);
+                holder.iconView.setImageResource(R.drawable.w10d);
                 break;
             case "10n":
-                myDrawable = context.getResources().getDrawable(R.drawable.w10n);
-                holder.iconView.setImageDrawable(myDrawable);
+                holder.iconView.setImageResource(R.drawable.w10n);
                 break;
             case "11d":
-                myDrawable = context.getResources().getDrawable(R.drawable.w11d);
-                holder.iconView.setImageDrawable(myDrawable);
+                holder.iconView.setImageResource(R.drawable.w11d);
                 break;
             case "11n":
-                myDrawable = context.getResources().getDrawable(R.drawable.w11d);
-                holder.iconView.setImageDrawable(myDrawable);
+                holder.iconView.setImageResource(R.drawable.w11d);
                 break;
             case "13d":
-                myDrawable = context.getResources().getDrawable(R.drawable.w13d);
-                holder.iconView.setImageDrawable(myDrawable);
+                holder.iconView.setImageResource(R.drawable.w13d);
                 break;
             case "13n":
-                myDrawable = context.getResources().getDrawable(R.drawable.w13d);
-                holder.iconView.setImageDrawable(myDrawable);
+                holder.iconView.setImageResource(R.drawable.w13d);
                 break;
             case "50d":
-                myDrawable = context.getResources().getDrawable(R.drawable.w50d);
-                holder.iconView.setImageDrawable(myDrawable);
+                holder.iconView.setImageResource(R.drawable.w50d);
                 break;
             case "50n":
-                myDrawable = context.getResources().getDrawable(R.drawable.w50d);
-                holder.iconView.setImageDrawable(myDrawable);
+                holder.iconView.setImageResource(R.drawable.w50d);
                 break;
             default:
-                    break;
+                break;
         }
 
     }
@@ -166,6 +147,12 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.TicketVi
 
     WeatherAdapter(ArrayList<Ticket> tickets) {
         this.tickets = tickets;
+    }
+
+
+    public void swapItems(ArrayList<Ticket> nTickets) {
+        tickets = nTickets;
+        notifyDataSetChanged();
     }
 
 
