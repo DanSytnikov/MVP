@@ -2,6 +2,7 @@ package com.example.user.weather;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -12,6 +13,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -49,10 +52,10 @@ public class MainActivity extends AppCompatActivity {
     private LocationManager locationManager;
     private Realm realm;
     TextView tv;
-
-
+    ArrayList<Ticket> tickets;
+    RecyclerView rv;
     MyBroadcastReceiver receiver;
-
+    private static MainActivity mApp = null;
 
     @Override
     protected void onStart() {
@@ -79,7 +82,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        rv = findViewById(R.id.recView);
+        mApp = this;
         setContentView(R.layout.activity_main);
         receiver = new MyBroadcastReceiver();
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -98,9 +102,19 @@ public class MainActivity extends AppCompatActivity {
         realm = Realm.getDefaultInstance();
     }
 
+    public static Context context()
+    {
+        return mApp.getApplicationContext();
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
+        rv =findViewById(R.id.recView);
+        rv.setHasFixedSize(true);
+        LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
+        rv.setLayoutManager(llm);
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
@@ -117,20 +131,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChange(RealmResults<Example> examples, OrderedCollectionChangeSet changeSet) {
                 RealmList<Data> dataList = realmResult.last().getData();
+                tickets = new ArrayList<>();
                 for (int i = 0; i < realmResult.last().getCnt() - 1; i++) {
-                    ArrayList<Ticket> tickets = new ArrayList<>();
                     tickets.add(new Ticket(dateFormatter(new java.util.Date((long) dataList.get(i).getDt() * 1000L)),
-                            dataList.get(i).getMain().getTemp(),
+                            (int)Math.round(dataList.get(i).getMain().getTemp() - 273.15),
                             dataList.get(i).getMain().getPressure(),
                             dataList.get(i).getMain().getHumidity(),
                             dataList.get(i).getWeather().get(0).getDescription(),
                             dataList.get(i).getWind().getSpeed(),
                             dataList.get(i).getWeather().get(0).getIcon()));
                     Log.e("DATE", dateFormatter(new java.util.Date((long) dataList.get(i).getDt() * 1000L)));
-
                 }
-
-
+                WeatherAdapter adapter = new WeatherAdapter(tickets);
+                rv.setAdapter(adapter);
             }
         });
     }
@@ -221,7 +234,7 @@ public class MainActivity extends AppCompatActivity {
         SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
         sdf.setTimeZone(java.util.TimeZone.getTimeZone("GMT+2"));
         String formattedDate = sdf.format(date);
-        formattedDate = formattedDate.substring(0, formattedDate.length() - 9);
+        formattedDate = formattedDate.substring(5, formattedDate.length() - 13);
         return formattedDate;
     }
 //    @SuppressLint("StaticFieldLeak")

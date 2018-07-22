@@ -7,21 +7,18 @@
     android:layout_height="match_parent"
     tools:context="com.example.user.weather.MainActivity">
 
-    <view class="android.support.v7.app.AlertController$RecycleListView"
-        
+    <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
-        android:layout_height="440dp"
+        android:layout_height="500dp"
         android:id="@+id/recView"
-        app:layoutManager = "android.support.v7.widget.LinearLayoutManager">
-
-    </view>
+        />
 
 
     <Button
+        style="@style/HijackThemeButton"
         android:id="@+id/button2"
         android:layout_width="158dp"
         android:layout_height="wrap_content"
-        android:background="@color/BurlyWood"
         android:onClick="onClick"
         android:text="@string/get_weather"
         app:layout_constraintBottom_toBottomOf="parent"

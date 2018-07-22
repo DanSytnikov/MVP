@@ -2,14 +2,14 @@ package com.example.user.weather;
 
 public class Ticket {
     String wDate;
-    Double wTemp;
+    Integer wTemp;
     Double wPressure;
     Integer wHumidity;
     String wDescr;
     double wWind;
     String wIcon;
 
-    Ticket (String _wDate, Double _wTemp, Double _wPressure, Integer _wHumidity, String _wDescr, double _wWind, String _wIcon){
+    Ticket (String _wDate, Integer _wTemp, Double _wPressure, Integer _wHumidity, String _wDescr, Double _wWind, String _wIcon){
         wDate = _wDate;
         wTemp = _wTemp;
         wPressure = _wPressure;
@@ -18,4 +18,5 @@ public class Ticket {
         wWind = _wWind;
         wIcon = _wIcon;
     }
+
 }
