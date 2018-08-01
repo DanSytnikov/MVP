@@ -9,7 +9,7 @@ public class Ticket {
     double wWind;
     String wIcon;
 
-    Ticket (String _wDate, Integer _wTemp, Double _wPressure, Integer _wHumidity, String _wDescr, Double _wWind, String _wIcon){
+    public Ticket (String _wDate, Integer _wTemp, Double _wPressure, Integer _wHumidity, String _wDescr, Double _wWind, String _wIcon){
         wDate = _wDate;
         wTemp = _wTemp;
         wPressure = _wPressure;

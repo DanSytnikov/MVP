@@ -23,6 +23,7 @@ import io.realm.RealmResults;
 public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.TicketViewHolder> {
 
     ArrayList<String> ImgUrl = new ArrayList<>();
+    private List<Ticket> tickets;
 
 
     @Override
@@ -123,9 +124,14 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.TicketVi
         return tickets.size();
     }
 
-    @Override
-    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
-        super.onAttachedToRecyclerView(recyclerView);
+    WeatherAdapter() {
+        this.tickets = new ArrayList<>();
+    }
+
+
+    public void swapItems(List<Ticket> nTickets) {
+        tickets = nTickets;
+        notifyDataSetChanged();
     }
 
     public static class TicketViewHolder extends RecyclerView.ViewHolder {
@@ -141,18 +147,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.TicketVi
             dt = itemView.findViewById(R.id.wDate);
             iconView = itemView.findViewById(R.id.wIcon);
         }
-    }
 
-    ArrayList<Ticket> tickets;
-
-    WeatherAdapter(ArrayList<Ticket> tickets) {
-        this.tickets = tickets;
-    }
-
-
-    public void swapItems(ArrayList<Ticket> nTickets) {
-        tickets = nTickets;
-        notifyDataSetChanged();
     }
 
 
