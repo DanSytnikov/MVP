@@ -65,7 +65,8 @@ public class WeatherInteractorImpl implements WeatherInteractor {
                     dataList.get(i).getMain().getHumidity(),
                     dataList.get(i).getWeather().get(0).getDescription(),
                     dataList.get(i).getWind().getSpeed(),
-                    dataList.get(i).getWeather().get(0).getIcon()));
+                    dataList.get(i).getWeather().get(0).getIcon(),
+                    dataList.get(i).getClouds().getAll()));
             Log.e("DATE", dateFormatter(new java.util.Date((long) dataList.get(i).getDt() * 1000L)));
         }
         return tickets;

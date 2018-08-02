@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -56,9 +57,11 @@ public class MainActivity extends AppCompatActivity implements WeatherView {
         weatherPresenter = new WeatherPresenterImpl(this);
     }
 
+
     @Override
     protected void onStart() {
         super.onStart();
+        onClick(findViewById(R.id.button2));
     }
 
 

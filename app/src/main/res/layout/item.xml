@@ -1,60 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:focusable="true"
-    android:focusableInTouchMode="true"
-    android:clickable="true"
+    android:id="@+id/transitions_container"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="vertical">
+
     <LinearLayout
-        android:id="@+id/linearLayout1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="5dp"
-        android:layout_weight="1"
-        android:orientation="vertical">
-        <TextView
-            android:id="@+id/wTempr"
+        android:orientation="horizontal">
+
+        <LinearLayout
+
+            android:id="@+id/linearLayout1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:textColor="@color/Black"
-            android:text=""
-            android:textSize="20sp">
-        </TextView>
+            android:layout_marginLeft="5dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/wTempr"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text=""
+                android:textColor="@color/Black"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/wDescr"
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
+                android:layout_marginTop="5dp"
+                android:text=""
+                android:textColor="@color/Black"
+                android:textSize="15sp" />
+
+
+
+        </LinearLayout>
+
         <TextView
-            android:id="@+id/wDescr"
-            android:layout_width="match_parent"
-            android:layout_height="25dp"
-            android:layout_marginTop="5dp"
-            android:textColor="@color/Black"
-            android:text=""
-            android:textSize="15sp">
-        </TextView>
-        <View
-            android:id="@+id/separator"
-            android:layout_height="0.5dp"
-            android:layout_width="match_parent"
-            android:background="@color/Black"/>
+            android:id="@+id/wDate"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_gravity="right"
+            android:layout_marginRight="10dp"
+            android:gravity="right"
+            android:text="" />
+
+        <ImageView
+            android:id="@+id/wIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/common_google_signin_btn_icon_dark_normal" />
+
+        <ImageButton
+            android:id="@+id/moreless_button"
+            android:layout_width="45dp"
+            android:clickable="false"
+            android:layout_height="45dp"
+            android:layout_gravity="center_vertical"
+            android:background="@null"
+            android:src="@drawable/baseline_expand_more_24px" />
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/wDate"
-        android:layout_width="wrap_content"
-        android:layout_height="20dp"
-        android:layout_gravity="right"
-        android:gravity="right"
-        android:layout_marginRight="10dp"
-        android:text="">
-    </TextView>
-    <ImageView
-        android:id="@+id/wIcon"
-        android:layout_gravity="center"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/common_google_signin_btn_icon_dark_normal">
-    </ImageView>
+        android:orientation="vertical"
+        android:id="@+id/hidden"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_marginLeft="20dp"
+            android:layout_width="wrap_content"
+            android:id="@+id/text"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="Pressure: "
+            android:textSize="18sp"
+            android:textColor="@color/Black" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/separator"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/Black" />
 
 </LinearLayout>
